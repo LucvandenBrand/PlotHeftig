@@ -8,10 +8,8 @@
 #define WIN 512
 #define INFINITY 300000
 
-
-float** getHeftigheid(char* audiosource)
+double** getHeftigheid(char* music_file)
 {
-    char *music_file = "tests/hallelujah.wav";
     FILE *in;
     char buf[WIN * 2];
     int nfft = WIN, i, fx;
