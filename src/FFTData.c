@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "FFTData.h"
 
+#define MAXDOUBLE 300000
+
 FFTData newFFTData(int window)
 {
 	FFTData data;
@@ -26,6 +28,29 @@ void addSample(FFTData* data, double* sample)
 {
 	resize(data);
 	data->samples[data->size++] = sample;
+}
+
+void normalize(FFTData data)
+{
+	double maxValue = -1;
+	double minValue = MAXDOUBLE;
+	for (int y=0; y<data.window; y++) {
+		for (int x=0; x<data.size; x++) {
+			if (data.samples[x][y] > maxValue) {
+				maxValue = data.samples[x][y];
+			} else if (data.samples[x][y] < minValue) {
+				minValue = data.samples[x][y];
+			}
+		}
+	}
+	double scaleValue = (maxValue - minValue);
+	
+	for (int y=0; y<data.window; y++) {
+		for (int x=0; x<data.size; x++) {
+			data.samples[x][y] -= minValue;
+			data.samples[x][y] /= scaleValue;
+		}
+	}
 }
 
 double** getSamples(FFTData data) 

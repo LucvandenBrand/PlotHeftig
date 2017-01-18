@@ -7,7 +7,6 @@
 #include "FFTData.h"
 
 #define WIN 512
-#define MAXDOUBLE 300000
 
 FFTData getHeftigheid(char* music_file)
 {
@@ -56,36 +55,19 @@ FFTData getHeftigheid(char* music_file)
         }
         addSample(&data, sample);
     }
+    normalize(data);
     free(cfg);
-    //scanf("%d");
-
     return data;
 }
 
 void fftDataToImage(char* imgName, FFTData fd) {
 	FILE *f = fopen(imgName, "wb");
 	fprintf(f, "P6\n%i %i 255\n", fd.size, fd.window);
-	double maxValue = -1;
-	double minValue = MAXDOUBLE;
 	for (int y=0; y<fd.window; y++) {
 		for (int x=0; x<fd.size; x++) {
-			if (fd.samples[x][y] > maxValue) {
-				maxValue = fd.samples[x][y];
-			} else {
-				if (fd.samples[x][y] < minValue) {
-					minValue = fd.samples[x][y];
-				}
-			}
-		}
-	}
-	double scaleValue = (maxValue-minValue);
-	printf("minValue = %f, maxValue = %f", minValue, maxValue);
-			
-	for (int y=0; y<fd.window; y++) {
-		for (int x=0; x<fd.size; x++) {
-			fputc((char) (fd.samples[x][y]-minValue)/scaleValue*255, f);   // 0 .. 255
-			fputc((char) (fd.samples[x][y]-minValue)/scaleValue*255, f); // 0 .. 255
-			fputc((char) (fd.samples[x][y]-minValue)/scaleValue*255, f);  // 0 .. 255
+			fputc((char) (fd.samples[x][y]*255), f);   // 0 .. 255
+			fputc((char) (fd.samples[x][y]*255), f); // 0 .. 255
+			fputc((char) (fd.samples[x][y]*255), f);  // 0 .. 255
 		}
 	}
 	fclose(f);
