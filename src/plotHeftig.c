@@ -6,6 +6,7 @@
 #include "KissFFT/kiss_fft.h"
 
 #define WIN 512
+#define INFINITY 300000
 
 
 float** getHeftigheid(char* audiosource)
@@ -59,6 +60,35 @@ float** getHeftigheid(char* audiosource)
     return NULL;
 }
 
+void fftDataToImage(char* imgName, FFTData fd) {
+	FILE *f = fopen(imgName, "wb");
+	fprintf(f, "P6\n%i %i 255\n", fd.size, fd.window);
+	double maxValue = -1;
+	double minValue = INFINITY;
+	for (int y=0; y<fd.window; y++) {
+		for (int x=0; x<fd.size; x++) {
+			if (fd.samples[x][y] > maxValue) {
+				maxValue = fd.samples[x][y];
+			} else {
+				if (fd.samples[x][y] < minValue) {
+					minValue = fd.samples[x][y];
+				}
+			}
+		}
+	}
+	double scaleValue = (maxValue-minValue);
+	printf("minValue = %d, maxValue = %d", minValue, maxValue);
+			
+	for (int y=0; y<fd.window; y++) {
+		for (int x=0; x<fd.size; x++) {
+			fputc((char) (fd.samples[x][y]-minValue)/scaleValue*255, f);   // 0 .. 255
+			fputc((char) (fd.samples[x][y]-minValue)/scaleValue*255, f); // 0 .. 255
+			fputc((char) (fd.samples[x][y]-minValue)/scaleValue*255, f);  // 0 .. 255
+		}
+	}
+	fclose(f);
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc < 2) 
@@ -66,6 +96,8 @@ int main(int argc, char* argv[])
 		printf("Usage: %s <audiofile>.wav\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	getHeftigheid(argv[1]);
+	FFTData fftData = fdgetHeftigheid(argv[1]);
+	fftDataToImage(fftData);
+	freeFFTData(fftData);
 	return EXIT_SUCCESS;
 }
