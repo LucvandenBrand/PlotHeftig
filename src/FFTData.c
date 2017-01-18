@@ -1,11 +1,5 @@
 #include <stdlib.h>
-
-typedef struct {
-	double** samples;
-	int window;
-	int size;
-	int maxSize;
-} FFTData;
+#include "FFTData.h"
 
 FFTData newFFTData(int window)
 {
