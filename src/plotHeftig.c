@@ -7,7 +7,7 @@
 #include "FFTData.h"
 
 #define WIN 512
-#define INFINITY 300000
+#define MAXDOUBLE 300000
 
 FFTData getHeftigheid(char* music_file)
 {
@@ -25,7 +25,7 @@ FFTData getHeftigheid(char* music_file)
     if (!in) {
         printf("unable to open file: %s\n", music_file);
         perror("Error");
-        return NULL;
+        exit(EXIT_FAILURE);
     }
     fx = 0;
     
@@ -42,7 +42,7 @@ FFTData getHeftigheid(char* music_file)
         //Display the value of a position
         int position = 511;
         intensity = sqrt(pow(cx_out[position].r, 2) + pow(cx_out[position].i, 2));
-        printf("%9.4f\n", intensity);
+        //printf("%9.4f\n", intensity);
 
         //Display all values
         
@@ -51,7 +51,7 @@ FFTData getHeftigheid(char* music_file)
             //printf("Joe: cx_out[i].r:%f\n", cx_out[i].r);
             //printf("Joe: cx_out[i].i:%f\n", cx_out[i].i);
             intensity = sqrt(pow(cx_out[i].r,2) + pow(cx_out[i].i,2));
-            printf("%d - %9.4f\n", i, intensity);
+            //printf("%d - %9.4f\n", i, intensity);
 			sample[i] = intensity;
         }
         addSample(&data, sample);
@@ -66,7 +66,7 @@ void fftDataToImage(char* imgName, FFTData fd) {
 	FILE *f = fopen(imgName, "wb");
 	fprintf(f, "P6\n%i %i 255\n", fd.size, fd.window);
 	double maxValue = -1;
-	double minValue = INFINITY;
+	double minValue = MAXDOUBLE;
 	for (int y=0; y<fd.window; y++) {
 		for (int x=0; x<fd.size; x++) {
 			if (fd.samples[x][y] > maxValue) {
@@ -79,7 +79,7 @@ void fftDataToImage(char* imgName, FFTData fd) {
 		}
 	}
 	double scaleValue = (maxValue-minValue);
-	printf("minValue = %d, maxValue = %d", minValue, maxValue);
+	printf("minValue = %f, maxValue = %f", minValue, maxValue);
 			
 	for (int y=0; y<fd.window; y++) {
 		for (int x=0; x<fd.size; x++) {
@@ -98,8 +98,8 @@ int main(int argc, char* argv[])
 		printf("Usage: %s <audiofile>.wav\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	FFTData fftData = fdgetHeftigheid(argv[1]);
-	fftDataToImage(fftData);
+	FFTData fftData = getHeftigheid(argv[1]);
+	fftDataToImage("result.ppm", fftData);
 	freeFFTData(fftData);
 	return EXIT_SUCCESS;
 }
