@@ -4,11 +4,12 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include <math.h>
 #include "KissFFT/kiss_fft.h"
+#include "FFTData.h"
 
 #define WIN 512
 #define INFINITY 300000
 
-double** getHeftigheid(char* music_file)
+FFTData getHeftigheid(char* music_file)
 {
     FILE *in;
     char buf[WIN * 2];
@@ -27,6 +28,8 @@ double** getHeftigheid(char* music_file)
         return NULL;
     }
     fx = 0;
+    
+    FFTData data = newFFTData(WIN);
     while (fread(buf, 1, WIN * 2, in)) 
     {
         for (i = 0;i<WIN;i++) {
@@ -43,19 +46,20 @@ double** getHeftigheid(char* music_file)
 
         //Display all values
         
+        double* sample = malloc(sizeof(double)*WIN);
         for (i = 0;i<WIN;i++) {
             //printf("Joe: cx_out[i].r:%f\n", cx_out[i].r);
             //printf("Joe: cx_out[i].i:%f\n", cx_out[i].i);
             intensity = sqrt(pow(cx_out[i].r,2) + pow(cx_out[i].i,2));
             printf("%d - %9.4f\n", i, intensity);
+			sample[i] = intensity;
         }
-        
-
+        addSample(&data, sample);
     }
     free(cfg);
     //scanf("%d");
 
-    return NULL;
+    return data;
 }
 
 void fftDataToImage(char* imgName, FFTData fd) {
