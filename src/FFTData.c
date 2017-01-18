@@ -53,6 +53,19 @@ void normalize(FFTData data)
 	}
 }
 
+double* analyseFFTData(FFTData data)
+{
+	double* samples = malloc(sizeof(double) * data.size);
+	for (int x=0; x < data.size; ++x) {
+		double sum = 0;
+		for (int y=0; y < data.window; ++y) {
+			sum += data.samples[x][y];
+		}
+		samples[x] = sum;
+	}
+	return samples;
+}
+
 double** getSamples(FFTData data) 
 {
 	return data.samples;

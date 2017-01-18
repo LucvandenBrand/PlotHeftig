@@ -14,4 +14,5 @@ void addSample(FFTData* data, double* sample);
 double** getSamples(FFTData data);
 void freeFFTData(FFTData data);
 void normalize(FFTData data);
+double* analyseFFTData(FFTData data);
 #endif

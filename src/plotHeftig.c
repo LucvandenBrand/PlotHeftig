@@ -8,7 +8,7 @@
 
 #define WIN 512
 
-FFTData getHeftigheid(char* music_file)
+FFTData getFFTData(char* music_file)
 {
     FILE *in;
     char buf[WIN * 2];
@@ -60,7 +60,8 @@ FFTData getHeftigheid(char* music_file)
     return data;
 }
 
-void fftDataToImage(char* imgName, FFTData fd) {
+void fftDataToImage(char* imgName, FFTData fd)
+{
 	FILE *f = fopen(imgName, "wb");
 	fprintf(f, "P6\n%i %i 255\n", fd.size, fd.window);
 	for (int y=0; y<fd.window; y++) {
@@ -80,8 +81,9 @@ int main(int argc, char* argv[])
 		printf("Usage: %s <audiofile>.wav\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	FFTData fftData = getHeftigheid(argv[1]);
+	FFTData fftData = getFFTData(argv[1]);
 	fftDataToImage("result.ppm", fftData);
+	double* heftigheid = analyseFFTData(fftData);
 	freeFFTData(fftData);
 	return EXIT_SUCCESS;
 }
